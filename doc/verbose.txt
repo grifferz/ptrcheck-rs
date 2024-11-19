@@ -1,0 +1,14 @@
+$ ~/ptrcheck --server 127.0.0.1:53 --zone dogsitter.services -v
+Asking 127.0.0.1:53 for AXFR of zone dogsitter.services
+Zone contains 57 records
+Found 3 unique address (A/AAAA) records
+➡ 2001:ba8:1f1:f113::2 is pointed to by:
+    tom.dogsitter.services.
+    Found PTR: tom.dogsitter.services.
+➡ 85.119.84.147 is pointed to by:
+    dogsitter.services., dev.dogsitter.services., tom.dogsitter.services., www.dogsitter.services.
+    Found PTR: dogsitter.services.
+➡ 2001:ba8:1f1:f113::80 is pointed to by:
+    dogsitter.services., dev.dogsitter.services., www.dogsitter.services.
+    Found PTR: www.dogsitter.services.
+🏆 100.0% good PTRs! Good job!

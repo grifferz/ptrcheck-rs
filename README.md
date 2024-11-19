@@ -13,6 +13,25 @@ Other times it is just a matter of pride! `ptrcheck` allows you to run
 constant, bulk checks on a whole DNS zone to give assurance that all `PTR`
 records are as they should be.
 
+### Typical run
+
+![typical]
+
+[typical]: doc/typical.png "Output of a typical run of ptrcheck"
+
+[(Plain text version)](doc/typical.txt)
+
+### Verbose run
+
+![verbose]
+
+[verbose]: doc/verbose.png "Output of a verbose run of ptrcheck"
+
+[(Plain text version)](doc/verbose.txt)
+
+Without the verbose option this would actually have been silent as all `PTR`s
+were "good".
+
 ## Installation
 
 Some binaries are available at the

@@ -1,0 +1,11 @@
+$ ~/ptrcheck --server 127.0.0.1:53 --zone bitfolk.com
+➡ 2001:8b0:ca07:c57a::20 is pointed to by:
+    strangebrew.21tc.bitfolk.com.
+    Missing PTR for 2001:8b0:ca07:c57a::20
+➡ 2001:ba8:1f1:f085::2 is pointed to by:
+    authns0.bitfolk.com.
+    Missing PTR for 2001:ba8:1f1:f085::2
+➡ 2a01:7e01::f03c:93ff:fe06:939a is pointed to by:
+    d.authns.bitfolk.com.
+    Missing PTR for 2a01:7e01::f03c:93ff:fe06:939a
+🔥 3 missing/broken PTR records

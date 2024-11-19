@@ -74,9 +74,9 @@ a name server that is authoritative for your zone.
 
 ### Server to do zone transfer from
 
-This is specified with `--server &lt;SERVER&gt;`. The `&lt;SERVER&gt;` part
-should be an IP address and port number separated by a colon. IPv6 addresses
-should be wrapped in square brackets. Hostnames are not supported.
+This is specified with `--server <SERVER>`. The `<SERVER>` part should be an
+IP address and port number separated by a colon. IPv6 addresses should be
+wrapped in square brackets. Hostnames are not supported.
 
 Examples:
 

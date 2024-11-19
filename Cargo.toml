@@ -1,0 +1,16 @@
+[package]
+name = "ptrcheck"
+description = "Check that all address records in a DNS zone have valid and acceptable PTR records associated"
+version = "0.1.0"
+authors = ["Andy Smith <andy-ptrcheck@bitfolk.com>"]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5", features = ["cargo", "derive"] }
+color-eyre = "0.6"
+emojis = "0.6"
+hickory-client = "0.24"
+hickory-resolver = "0.24"
+owo-colors = { version = "4.1.0", features = ["supports-colors"] }
+regex = "1.11"

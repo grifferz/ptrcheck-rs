@@ -3,8 +3,6 @@
 Check that every address record (`A`/`AAAA`) in a DNS zone has a valid and
 acceptable corresponding `PTR` record.
 
-(I will attempt to put some raw HTML output here so the colors are preserved)
-
 ## Introduction
 
 Remembering to set correct reverse DNS is sometimes hard, yet sometimes it is

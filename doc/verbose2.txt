@@ -1,0 +1,36 @@
+$ ~/ptrcheck --server 127.0.0.1:53 --zone bitfolk.co.uk -v
+Asking 127.0.0.1:53 for AXFR of zone bitfolk.co.uk
+Zone contains 61 records
+Found 10 unique address (A/AAAA) records
+➡ 172.104.29.216 is pointed to by:
+    c.authns.bitfolk.co.uk.
+    Found PTR: c.authns.bitfolk.com.
+➡ 2600:3c01:e000:259::53 is pointed to by:
+    b.authns.bitfolk.co.uk.
+    Found PTR: b.authns.bitfolk.com.
+➡ 2001:ba8:1f1:f085::53 is pointed to by:
+    a.authns.bitfolk.co.uk.
+    Found PTR: a.authns.bitfolk.co.uk.
+➡ 2600:3c03:e000:432::53 is pointed to by:
+    c.authns.bitfolk.co.uk.
+    Found PTR: c.authns.bitfolk.com.
+➡ 85.119.80.199 is pointed to by:
+    bitfolk.co.uk.
+    Found PTR: bitweb-vip.bitfolk.com.
+➡ 85.119.80.222 is pointed to by:
+    a.authns.bitfolk.co.uk.
+    Found PTR: a.authns.bitfolk.co.uk.
+➡ 172.104.240.122 is pointed to by:
+    d.authns.bitfolk.co.uk.
+    Found PTR: 172-104-240-122.ip.linodeusercontent.com.
+➡ 2001:ba8:1f1:f036::2 is pointed to by:
+    bitfolk.co.uk.
+    Found PTR: bitweb-vip.bitfolk.com.
+➡ 2a01:7e01::f03c:93ff:fe06:939a is pointed to by:
+    d.authns.bitfolk.co.uk.
+    Missing PTR for 2a01:7e01::f03c:93ff:fe06:939a
+➡ 45.33.107.124 is pointed to by:
+    b.authns.bitfolk.co.uk.
+    Found PTR: b.authns.bitfolk.com.
+🔥 1 missing/broken PTR record
+✨ 90.0% good PTRs!

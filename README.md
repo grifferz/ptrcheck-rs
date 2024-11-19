@@ -21,14 +21,24 @@ records are as they should be.
 
 ### Verbose run
 
+Without the verbose option this would actually have been silent as all `PTR`s
+were "good".
+
 ![verbose]
 
 [verbose]: doc/verbose.png "Output of a verbose run of ptrcheck"
 
 [(Plain text version)](doc/verbose.txt)
 
-Without the verbose option this would actually have been silent as all `PTR`s
-were "good".
+And another verbose run, this time with only partial success.
+
+![verbose2]
+
+[verbose2]:
+  doc/verbose2.png
+  "Output of a verbose run of ptrcheck, showing only partial success"
+
+[(Plain text version)](doc/verbose2.txt)
 
 ## Installation
 

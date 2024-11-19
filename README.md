@@ -129,12 +129,10 @@ In particular this means:
 
 ### Exit codes
 
-<dl>
-  <dt>0</dt>
-  <dd>When no problems were detected</dd>
-  <dt>1</dt>
-  <dd>When any "bad" `PTR` records are detected</dd>
-</dl>
+- `0`
+  - When no problems were detected
+- `1`
+  - When any "bad" `PTR` records are detected
 
 ## Limitations
 

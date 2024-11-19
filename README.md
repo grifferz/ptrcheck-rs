@@ -110,6 +110,15 @@ In particular this means:
   hostnames these may point at IP addresses you cannot ever resolve `PTR`
   records for, and that is not necessarily an error.
 
+### Exit codes
+
+<dl>
+  <dt>0</dt>
+  <dd>When no problems were detected</dd>
+  <dt>1</dt>
+  <dd>When any "bad" `PTR` records are detected</dd>
+</dl>
+
 ## Limitations
 
 ### Things I'll probably try to improve

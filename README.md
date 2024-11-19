@@ -131,6 +131,8 @@ point.
   This is quite slow. Async would likely improve this.
 - Should be able to specify a host name for the DNS server to query.
 - Port should default to 53 if not supplied.
+- There should be an option for a silent mode. You would use the exit code to
+  tell if there were a problem or not.
 - An option to ignore some address blocks would be useful, in order to exclude
   [the RFC1918 private blocks](https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses)
   from checking, for example.

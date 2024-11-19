@@ -161,6 +161,10 @@ point.
 - An option to ignore some address blocks would be useful, in order to exclude
   [the RFC1918 private blocks](https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses)
   from checking, for example.
+- There's no point in doing another check of a zone if the zone content hasn't
+  changed. It might be possible to hook this into a DNS server to trigger
+  that, or just have it keep track of which zone serial numbers it has already
+  checked.
 - Zone content should be optionally obtainable from a file instead of a zone
   transfer. This would be a bit faster, would facilitate more testing, and
   would make the tool useful for people who don't have AXFR access to their
@@ -179,6 +183,11 @@ them, but I still welcome assistance.
 - I can imagine _someone_ wanting to specify a different resolver to use other
   than what they have in their `/etc/resolv.conf`, but it's not a need I have
   personally.
+- `ptrcheck` currently only checks that there is _some_ `PTR` content. Some
+  might like an optional stricter check that requires that a successful chain
+  of `hostname1` → `IP` → `hostname2` → `IP` exist where `hostname1` and
+  `hostname2` may or may not be the same thing, i.e. that at least one forward
+  and reverse mapping is in agreement.
 
 ## Disclaimer
 

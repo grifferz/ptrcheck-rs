@@ -132,7 +132,7 @@ In particular this means:
 - `0`
   - When no problems were detected
 - `1`
-  - When any "bad" `PTR` records are detected
+  - When any "bad" `PTR` records were detected
 
 ## Limitations
 

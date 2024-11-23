@@ -143,6 +143,8 @@ In particular this means:
   - When no problems were detected
 - `1`
   - When any "bad" `PTR` records were detected
+- `2`
+  - Initial zone transfer request was refused
 
 ## Limitations
 

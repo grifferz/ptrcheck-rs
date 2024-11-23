@@ -5,6 +5,7 @@ use color_eyre::eyre::Result;
 
 use hickory_client::client::{Client, SyncClient};
 use hickory_client::op::DnsResponse;
+use hickory_client::op::ResponseCode;
 use hickory_client::rr::{DNSClass, Name, RecordType};
 use hickory_client::tcp::TcpClientConnection;
 
@@ -271,7 +272,13 @@ fn do_axfr(
         }
     };
 
+    // Refused AXFR is the most common problem here.
     if !response.contains_answer() {
+        if response.response_code() == ResponseCode::Refused {
+            eprintln!("DNS server at {} refused our AXFR", address);
+            std::process::exit(2);
+        }
+
         return Err(eyre!("AXFR returned no answers: {response:?}"));
     }
 

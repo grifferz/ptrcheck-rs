@@ -88,17 +88,6 @@ fn main() -> Result<()> {
             }
         }
     }
-    // match &args.badre {
-    //     Some(badre) => match Regex::new(&badre) {
-    //         Ok(r) => {
-    //             re = Some(r);
-    //         }
-    //         Err(_) => {
-    //             return Err(eyre!("Invalid regex: {}", badre));
-    //         }
-    //     },
-    //     _ => {}
-    // }
 
     let ip_port = args.server.clone();
 

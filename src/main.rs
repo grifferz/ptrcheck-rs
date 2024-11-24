@@ -1,6 +1,7 @@
 use clap::{Parser, ValueEnum};
 
 use color_eyre::eyre::eyre;
+use color_eyre::eyre::Context;
 use color_eyre::eyre::Result;
 
 use hickory_client::client::{Client, SyncClient};
@@ -90,15 +91,15 @@ fn main() -> Result<()> {
         }
     }
 
-    let ip_port = args.server.clone();
+    let address = parse_socketaddr(&args.server)?;
 
-    let address = ip_port.parse()?;
     let zone = Name::from_utf8(&args.zone)?;
 
     if args.verbose {
         println!(
-            "Asking {} for AXFR of zone {}",
-            ip_port.if_supports_color(Stdout, |t| t.cyan()),
+            "Connecting to {} port {} for AXFR of zone {}",
+            address.ip().if_supports_color(Stdout, |t| t.cyan()),
+            address.port().if_supports_color(Stdout, |t| t.cyan()),
             zone.if_supports_color(Stdout, |t| t.cyan())
         );
     }
@@ -211,6 +212,38 @@ fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+fn parse_socketaddr(ip_port: &str) -> Result<SocketAddr> {
+    let re = Regex::new(r"\[?(?<ip>[^]]+)\]?:(?<port>[0-9]+)$")?;
+
+    match re.captures(ip_port) {
+        Some(caps) => {
+            // Did get two things separated by ':' (with optional wrapping []) so treat these as IP
+            // address and port number.
+            let ip: IpAddr = caps["ip"]
+                .parse()
+                .wrap_err(format!("Not a valid IP address: {}", &caps["ip"]))?;
+
+            let port = caps["port"].parse::<u16>().wrap_err(format!(
+                "Port should be an integer between 1 and 65535. Got: {}",
+                &caps["port"]
+            ))?;
+
+            Ok(SocketAddr::new(ip, port))
+        }
+        _ => {
+            // Didn't end in ":[0-9]+" so assume port 53 and that rest of `ip_port` is just an IP
+            // address.
+            // Need to strip any [] that may enclose.
+            let ip_str = ip_port.replace(['[', ']'], "");
+
+            let ip: IpAddr = ip_str
+                .parse()
+                .wrap_err(format!("Not a valid IP address: {}", ip_str))?;
+            Ok(SocketAddr::new(ip, 53))
+        }
+    }
 }
 
 fn list_names(addr: &IpAddr, names: &[String]) {

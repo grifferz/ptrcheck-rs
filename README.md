@@ -58,24 +58,31 @@ your path or run it from anywhere.
 ## Usage
 
 ```
-$ ptrcheck -h
-ptrcheck 0.1.0
+ptrcheck 0.1.1
 Andy Smith <andy-ptrcheck@bitfolk.com>
 
-Check that all address records in a DNS zone have valid and acceptable
-PTR records associated
+Check that all address records in a DNS zone have valid and
+acceptable PTR records associated
 
 Usage: ptrcheck [OPTIONS] --server <SERVER> --zone <ZONE>
 
 Options:
-  -b, --badre <BADRE>    Regular expression for unacceptable PTRs
-  -c, --color <COLOR>    Use colored output [default: auto]
-                         [possible values: auto, always, never]
-  -s, --server <SERVER>  Server to do AXFR against (in form IP:port)
-  -v, --verbose          Be more verbose
-  -z, --zone <ZONE>      Zone to check PTR records for
-  -h, --help             Print help
-  -V, --version          Print version
+  -b, --badre <BADRE>
+          Regular expression for unacceptable PTRs
+  -c, --color <COLOR>
+          Use colored output [default: auto] [possible
+          values: auto, always, never]
+  -s, --server <SERVER>
+          Server to do AXFR against (in form "IP:port";
+          ":port" optional)
+  -v, --verbose
+          Be more verbose
+  -z, --zone <ZONE>
+          Zone to check PTR records for
+  -h, --help
+          Print help
+  -V, --version
+          Print version
 ```
 
 The required arguments are `--server` and `--zone`. `ptrcheck` gets its zone
@@ -86,13 +93,14 @@ a name server that is authoritative for your zone.
 
 This is specified with `--server <SERVER>`. The `<SERVER>` part should be an
 IP address and port number separated by a colon. IPv6 addresses should be
-wrapped in square brackets. Hostnames are not supported.
+wrapped in square brackets. The `:<PORT>` part can be omitted in which case
+port 53 will be used. Host names are not supported.
 
 Examples:
 
 ```
-$ ptrcheck --server 127.0.0.1:53 --zone example.com
-$ ptrcheck --server [::1]:53 --zone example.com
+$ ptrcheck --server 127.0.0.1:5353 --zone example.com
+$ ptrcheck --server [::1] --zone example.com
 ```
 
 ### Zone to check
@@ -117,7 +125,7 @@ Example:
 
 ```
 $ ptrcheck \
-  --server [::1]:53 \
+  --server [::1] \
   --zone example.com \
   --badre 'linodeusercontent|vps\.ovh\.net'
 ```
@@ -157,7 +165,7 @@ point.
   individual `PTR` queries are made one after another with default timeouts.
   This is quite slow. Async would likely improve this.
 - Should be able to specify a host name for the DNS server to query.
-- Port should default to 53 if not supplied.
+- [x] ~Port should default to 53 if not supplied.~
 - There should be an option for a silent mode. You would use the exit code to
   tell if there were a problem or not.
 - An option to ignore some address blocks would be useful, in order to exclude
@@ -199,4 +207,3 @@ I'm not yet aware of. I welcome constructive feedback and assistance, though I
 may not be capable of acting upon it. Please contact me or file
 [a GitHub issue](https://github.come/grifferz/ptrcheck-rs/issues) for any
 bugs, feature requests or other feedback.
-

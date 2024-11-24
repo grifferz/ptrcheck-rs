@@ -41,7 +41,7 @@ struct Arguments {
     /// Use colored output
     #[clap(short, long, value_enum, default_value_t=Color::Auto)]
     color: Color,
-    /// Server to do AXFR against (in form IP:port)
+    /// Server to do AXFR against (in form "IP:port"; ":port" optional)
     #[arg(short, long)]
     server: String,
     /// Be more verbose

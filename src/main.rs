@@ -313,14 +313,25 @@ fn do_axfr(
         }
     };
 
-    // Refused AXFR is the most common problem here.
     if !response.contains_answer() {
-        if response.response_code() == ResponseCode::Refused {
-            eprintln!("DNS server at {} refused our AXFR", address);
-            std::process::exit(2);
+        match response.response_code() {
+            // Refused AXFR is the most common reason for getting no answers.
+            ResponseCode::Refused => {
+                eprintln!("DNS server at {} refused our AXFR", address);
+                std::process::exit(2);
+            }
+            // NotAuth also rather likely.
+            ResponseCode::NotAuth => {
+                eprintln!(
+                    "DNS server at {} is not authoritative for zone {}",
+                    address, zone
+                );
+                std::process::exit(2);
+            }
+            _ => {
+                return Err(eyre!("AXFR returned no answers: {response:?}"));
+            }
         }
-
-        return Err(eyre!("AXFR returned no answers: {response:?}"));
     }
 
     let answers = response.answers();

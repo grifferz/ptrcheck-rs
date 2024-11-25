@@ -152,7 +152,7 @@ In particular this means:
 - `1`
   - When any "bad" `PTR` records were detected
 - `2`
-  - Initial zone transfer request was refused
+  - DNS protocol error with initial `AXFR` such as "Refused" or "NotAuth"
 
 ## Limitations
 

@@ -215,7 +215,7 @@ fn main() -> Result<()> {
 }
 
 fn parse_socketaddr(ip_port: &str) -> Result<SocketAddr> {
-    let re = Regex::new(r"\[?(?<ip>[^]]+)\]?:(?<port>[0-9]+)$")?;
+    let re = Regex::new(r"\[?(?<ip>[^]]+)\]?:(?<port>[^]]+)$")?;
 
     match re.captures(ip_port) {
         Some(caps) => {
@@ -230,11 +230,15 @@ fn parse_socketaddr(ip_port: &str) -> Result<SocketAddr> {
                 &caps["port"]
             ))?;
 
+            if port == 0 {
+                panic!("Port cannot be 0");
+            }
+
             Ok(SocketAddr::new(ip, port))
         }
         _ => {
-            // Didn't end in ":[0-9]+" so assume port 53 and that rest of `ip_port` is just an IP
-            // address.
+            // Didn't end in a colon and some other stuff, so assume port is 53 and that the rest
+            // of `ip_port` is just an IP address.
             // Need to strip any [] that may enclose.
             let ip_str = ip_port.replace(['[', ']'], "");
 
@@ -301,7 +305,11 @@ fn do_axfr(
     let response: DnsResponse = match client.query(&zone, DNSClass::IN, RecordType::AXFR) {
         Ok(resp) => resp,
         Err(err) => {
-            return Err(eyre!("Failed to create DNS query: {:?}", err));
+            return Err(eyre!(
+                "Failed to create DNS query for {}: {:?}",
+                address,
+                err
+            ));
         }
     };
 
@@ -348,4 +356,89 @@ fn do_axfr(
     }
 
     Ok(seen)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn can_parse_ipv4_and_port_to_socket_addr() {
+        let ip_port = "127.0.0.1:53";
+
+        let sa = parse_socketaddr(ip_port).unwrap();
+
+        assert_eq!("127.0.0.1".parse(), Ok(sa.ip()));
+        assert_eq!(53, sa.port());
+    }
+
+    #[test]
+    fn can_parse_ipv6_and_port_to_socket_addr() {
+        let ip_port = "[::1]:53";
+
+        let sa = parse_socketaddr(ip_port).unwrap();
+
+        assert_eq!("::1".parse(), Ok(sa.ip()));
+        assert_eq!(53, sa.port());
+    }
+
+    #[test]
+    fn can_parse_ipv4_without_port_to_socket_addr() {
+        let ip_port = "127.0.0.1";
+
+        let sa = parse_socketaddr(ip_port).unwrap();
+
+        assert_eq!("127.0.0.1".parse(), Ok(sa.ip()));
+        assert_eq!(53, sa.port());
+    }
+
+    #[test]
+    fn can_parse_ipv6_without_port_to_socket_addr() {
+        let ip_port = "[::1]";
+
+        let sa = parse_socketaddr(ip_port).unwrap();
+
+        assert_eq!("::1".parse(), Ok(sa.ip()));
+        assert_eq!(53, sa.port());
+    }
+
+    #[test]
+    #[should_panic]
+    fn panics_on_parsing_invalid_port() {
+        let ip_port = "[::1]:abc";
+
+        let _sa = parse_socketaddr(ip_port).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn panics_on_parsing_too_big_port() {
+        let ip_port = "[::1]:66666";
+
+        let _sa = parse_socketaddr(ip_port).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn panics_on_parsing_zero_port() {
+        let ip_port = "[::1]:0";
+
+        let _sa = parse_socketaddr(ip_port).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn panics_on_parsing_invalid_ipv4() {
+        let ip_port = "127.0.0.300";
+
+        let _sa = parse_socketaddr(ip_port).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn panics_on_parsing_invalid_ipv6() {
+        let ip_port = "[foo]";
+
+        let _sa = parse_socketaddr(ip_port).unwrap();
+    }
 }

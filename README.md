@@ -175,10 +175,6 @@ point.
       [the RFC1918 private blocks](https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses)
       from checking, for example.
       [Filed as GitHub issue #6](https://github.com/grifferz/ptrcheck-rs/issues/6).
-- [ ] There's no point in doing another check of a zone if the zone content
-      hasn't changed. It might be possible to hook this into a DNS server to
-      trigger that, or just have it keep track of which zone serial numbers it
-      has already checked.
 - [ ] Zone content should be optionally obtainable from a file instead of a
       zone transfer. This would be a bit faster, would facilitate more
       testing, and would make the tool useful for people who don't have AXFR

@@ -161,31 +161,40 @@ In particular this means:
 These things affect me so I will probably get around to improving them at some
 point.
 
-- This is synchronous, single-threaded code. A zone is transferred and then
-  individual `PTR` queries are made one after another with default timeouts.
-  This is quite slow. Async would likely improve this.
-- Should be able to specify a host name for the DNS server to query.
+- [ ] This is synchronous, single-threaded code. A zone is transferred and
+      then individual `PTR` queries are made one after another with default
+      timeouts. This is quite slow. Async would likely improve this.
+      [Filed as GitHub issue #3](https://github.com/grifferz/ptrcheck-rs/issues/3).
+- [ ] Should be able to specify a host name for the DNS server to query.
+      [Filed as GitHub issue #4](https://github.com/grifferz/ptrcheck-rs/issues/4).
+- [ ] There should be an option for a silent mode. You would use the exit code
+      to tell if there were a problem or not.
+      [Filed as GitHub issue #5](https://github.com/grifferz/ptrcheck-rs/issues/5).
+- [ ] An option to ignore some address blocks would be useful, in order to
+      exclude
+      [the RFC1918 private blocks](https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses)
+      from checking, for example.
+      [Filed as GitHub issue #6](https://github.com/grifferz/ptrcheck-rs/issues/6).
+- [ ] There's no point in doing another check of a zone if the zone content
+      hasn't changed. It might be possible to hook this into a DNS server to
+      trigger that, or just have it keep track of which zone serial numbers it
+      has already checked.
+- [ ] Zone content should be optionally obtainable from a file instead of a
+      zone transfer. This would be a bit faster, would facilitate more
+      testing, and would make the tool useful for people who don't have AXFR
+      access to their name servers.
+      [Filed as GitHub issue #7](https://github.com/grifferz/ptrcheck-rs/issues/7).
+- [ ] Did I say testing? There's no tests here. There really should be, but I
+      wasn't up to mocking a DNS server and I wanted to get something
+      achieved.
 - [x] ~Port should default to 53 if not supplied.~
-- There should be an option for a silent mode. You would use the exit code to
-  tell if there were a problem or not.
-- An option to ignore some address blocks would be useful, in order to exclude
-  [the RFC1918 private blocks](https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses)
-  from checking, for example.
-- There's no point in doing another check of a zone if the zone content hasn't
-  changed. It might be possible to hook this into a DNS server to trigger
-  that, or just have it keep track of which zone serial numbers it has already
-  checked.
-- Zone content should be optionally obtainable from a file instead of a zone
-  transfer. This would be a bit faster, would facilitate more testing, and
-  would make the tool useful for people who don't have AXFR access to their
-  name servers.
-- Did I say testing? There's no tests here. There really should be, but I
-  wasn't up to mocking a DNS server and I wanted to get something achieved.
+      [Closed as GitHub issue #1](https://github.com/grifferz/ptrcheck-rs/issues/1).
 
 ### Known issues that aren't a personal priority
 
 These limitations don't bother me for my use cases so I'm unlikely to fix
-them, but I still welcome assistance.
+them, but I still welcome assistance. Please file an issue if any of this
+actually affects you (no promises though).
 
 - There's no [TSIG](https://en.wikipedia.org/wiki/TSIG) support so zone
   transfers are authenticated by IP address alone.

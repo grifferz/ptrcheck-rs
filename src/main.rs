@@ -5,9 +5,8 @@ use color_eyre::eyre::Context;
 use color_eyre::eyre::Result;
 
 use hickory_client::client::{Client, SyncClient};
-use hickory_client::op::DnsResponse;
 use hickory_client::op::ResponseCode;
-use hickory_client::rr::{DNSClass, Name, RecordType};
+use hickory_client::rr::{Name, RecordType};
 use hickory_client::tcp::TcpClientConnection;
 
 use hickory_resolver::{error::ResolveErrorKind, Resolver};
@@ -302,7 +301,9 @@ fn do_axfr(
     let conn = TcpClientConnection::new(address)?;
     let client = SyncClient::new(conn);
 
-    let response: DnsResponse = match client.query(&zone, DNSClass::IN, RecordType::AXFR) {
+    // Specify `None` for `last_soa` to get whole zone content. If we specified an SOA this would
+    // be an IXFR, but we need it all.
+    let response_stream = match client.zone_transfer(&zone, None) {
         Ok(resp) => resp,
         Err(err) => {
             return Err(eyre!(
@@ -313,57 +314,80 @@ fn do_axfr(
         }
     };
 
-    if !response.contains_answer() {
-        match response.response_code() {
-            // Refused AXFR is the most common reason for getting no answers.
-            ResponseCode::Refused => {
-                eprintln!("DNS server at {} refused our AXFR", address);
-                std::process::exit(2);
+    let mut num_records = 0;
+
+    // Usually there is just one DnsResponse that contains an SOA record, list of zone records and
+    // then a final SOA record. Sometimes though, especially with PowerDNS, this can be split over
+    // multiple responses!
+    for response in response_stream {
+        let response = match response {
+            Ok(r) => r,
+            Err(_) => {
+                return Err(eyre!("Invalid response to AXFR: {response:?}"));
             }
-            // NotAuth also rather likely.
-            ResponseCode::NotAuth => {
-                eprintln!(
-                    "DNS server at {} is not authoritative for zone {}",
-                    address, zone
-                );
-                std::process::exit(2);
+        };
+
+        if !response.contains_answer() {
+            match response.response_code() {
+                // NoError is okay. Some responses can be empty.
+                ResponseCode::NoError => {
+                    continue;
+                }
+                // Refused AXFR is the most common reason for getting no answers.
+                ResponseCode::Refused => {
+                    eprintln!("DNS server at {} refused our AXFR", address);
+                    std::process::exit(2);
+                }
+                // NotAuth also rather likely.
+                ResponseCode::NotAuth => {
+                    eprintln!(
+                        "DNS server at {} is not authoritative for zone {}",
+                        address, zone
+                    );
+                    std::process::exit(2);
+                }
+                _ => {
+                    return Err(eyre!("AXFR returned no answers: {response:?}"));
+                }
             }
-            _ => {
-                return Err(eyre!("AXFR returned no answers: {response:?}"));
-            }
+        }
+
+        let answers = response.answers();
+
+        if args.verbose {
+            num_records += answers.len();
+        }
+
+        let answers = answers
+            .iter()
+            .filter(|rec| matches!(rec.record_type(), RecordType::A | RecordType::AAAA));
+
+        for record in answers {
+            let rr_name = record.name().to_utf8();
+
+            let rr_data = match record.data() {
+                Some(data) => data,
+                None => continue,
+            };
+
+            let rr_addr = match rr_data.ip_addr() {
+                Some(addr) => addr,
+                None => continue,
+            };
+
+            seen.entry(rr_addr).or_insert_with(Vec::new).push(rr_name);
         }
     }
 
-    let answers = response.answers();
-
     if args.verbose {
-        let num_records = answers.len();
+        // AXFR always contains two SOA records, one at the sart and one at the end.
+        num_records -= 2;
 
         println!(
             "Zone contains {} record{}",
             num_records.if_supports_color(Stdout, |t| t.green()),
             if num_records == 1 { "" } else { "s" }
         );
-    }
-
-    let answers = answers
-        .iter()
-        .filter(|rec| matches!(rec.record_type(), RecordType::A | RecordType::AAAA));
-
-    for record in answers {
-        let rr_name = record.name().to_utf8();
-
-        let rr_data = match record.data() {
-            Some(data) => data,
-            None => continue,
-        };
-
-        let rr_addr = match rr_data.ip_addr() {
-            Some(addr) => addr,
-            None => continue,
-        };
-
-        seen.entry(rr_addr).or_insert_with(Vec::new).push(rr_name);
     }
 
     Ok(seen)

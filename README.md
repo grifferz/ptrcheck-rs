@@ -58,7 +58,7 @@ your path or run it from anywhere.
 ## Usage
 
 ```
-ptrcheck 0.1.1
+ptrcheck 0.1.2-dev
 Andy Smith <andy-ptrcheck@bitfolk.com>
 
 Check that all address records in a DNS zone have valid and

@@ -13,32 +13,30 @@ records are as they should be.
 
 ### Typical run
 
-![typical]
+[![typical]](https://raw.githubusercontent.com/grifferz/ptrcheck-rs/refs/heads/main/doc/ptrcheck-typical.svg)
 
-[typical]: doc/typical.png "Output of a typical run of ptrcheck"
-
-[(Plain text version)](doc/typical.txt)
+[typical]:
+  doc/ptrcheck-typical.svg
+  "Output of a typical run of ptrcheck. Click/tap to scale or copy/paste text"
 
 ### Verbose run
 
 Without the verbose option this would actually have been silent as all `PTR`s
 were "good".
 
-![verbose]
+[![verbose]](https://raw.githubusercontent.com/grifferz/ptrcheck-rs/refs/heads/main/doc/ptrcheck-verbose.svg)
 
-[verbose]: doc/verbose.png "Output of a verbose run of ptrcheck"
-
-[(Plain text version)](doc/verbose.txt)
+[verbose]:
+  doc/ptrcheck-verbose.svg
+  "Output of a verbose run of ptrcheck. Click/tap to scale or copy/paste text"
 
 And another verbose run, this time with only partial success.
 
-![verbose2]
+[![verbose2]](https://raw.githubusercontent.com/grifferz/ptrcheck-rs/refs/heads/main/doc/ptrcheck-verbose2.svg)
 
 [verbose2]:
-  doc/verbose2.png
-  "Output of a verbose run of ptrcheck, showing only partial success"
-
-[(Plain text version)](doc/verbose2.txt)
+  doc/verbose2.svg
+  "Output of a verbose run of ptrcheck, showing only partial success. Click/tap to scale or copy/paste text"
 
 ## Installation
 

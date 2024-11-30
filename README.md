@@ -35,7 +35,7 @@ And another verbose run, this time with only partial success.
 [![verbose2]](https://raw.githubusercontent.com/grifferz/ptrcheck-rs/refs/heads/main/doc/ptrcheck-verbose2.svg)
 
 [verbose2]:
-  doc/verbose2.svg
+  doc/ptrcheck-verbose2.svg
   "Output of a verbose run of ptrcheck, showing only partial success. Click/tap to scale or copy/paste text"
 
 ## Installation

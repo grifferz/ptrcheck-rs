@@ -9,6 +9,7 @@ use hickory_client::op::ResponseCode;
 use hickory_client::rr::{Name, RecordType};
 use hickory_client::tcp::TcpClientConnection;
 
+use hickory_resolver::error::ResolveError;
 use hickory_resolver::{error::ResolveErrorKind, Resolver};
 
 use owo_colors::{OwoColorize, Stream::Stdout};
@@ -121,45 +122,72 @@ fn main() -> Result<()> {
             list_names(addr, names);
         }
 
-        if let Some(ptrnames) = get_ptrs(addr) {
-            for ptr in ptrnames {
-                // If a badre was supplied then need to check PTR against that. We compiled it
-                // into `re` earlier.
-                if let Some(r) = &re {
-                    if let Some(_captures) = r.captures(&ptr) {
-                        // This PTR matched the bad regex!
+        match get_ptrs(addr) {
+            Ok(ptrnames) => {
+                // There were 0 or more PTR names found.
+                // But actually were there any names?
+                if ptrnames.is_empty() {
+                    // Always list the names when there's an error, but in verbose mode we have
+                    // already listed them.
+                    if !args.verbose {
+                        list_names(addr, names);
+                    }
+                    println!(
+                        "    {} for {}",
+                        "Missing PTR".if_supports_color(Stdout, |t| t.bright_red()),
+                        addr.if_supports_color(Stdout, |t| t.cyan())
+                    );
+
+                    failcount += 1;
+
+                    // Leave match {} early.
+                    break;
+                }
+                for ptr in ptrnames {
+                    // If a badre was supplied then need to check PTR against that. We compiled it
+                    // into `re` earlier.
+                    if let Some(r) = &re {
+                        if let Some(_captures) = r.captures(&ptr) {
+                            // This PTR matched the bad regex!
+                            if !args.verbose {
+                                list_names(addr, names);
+                            }
+                            println!(
+                                "    {} '{}' for {} (matched regexp '{}')",
+                                "Bad PTR content".if_supports_color(Stdout, |t| t.bright_red()),
+                                ptr.if_supports_color(Stdout, |t| t.bright_red()),
+                                addr.if_supports_color(Stdout, |t| t.cyan()),
+                                r.as_str().if_supports_color(Stdout, |t| t.cyan())
+                            );
+
+                            failcount += 1;
+                        }
+                    } else if args.verbose {
+                        println!(
+                            "    {}: {ptr}",
+                            "Found PTR".if_supports_color(Stdout, |t| t.green())
+                        );
+                    }
+                }
+            }
+            Err(e) => {
+                // There was a ResolveError.
+                match e.kind() {
+                    ResolveErrorKind::Timeout => {
                         if !args.verbose {
                             list_names(addr, names);
                         }
                         println!(
-                            "    {} '{}' for {} (matched regexp '{}')",
-                            "Bad PTR content".if_supports_color(Stdout, |t| t.bright_red()),
-                            ptr.if_supports_color(Stdout, |t| t.bright_red()),
-                            addr.if_supports_color(Stdout, |t| t.cyan()),
-                            r.as_str().if_supports_color(Stdout, |t| t.cyan())
+                            "    {}",
+                            "DNS resolution timeout".if_supports_color(Stdout, |t| t.bright_red())
                         );
-
                         failcount += 1;
                     }
-                } else if args.verbose {
-                    println!(
-                        "    {}: {ptr}",
-                        "Found PTR".if_supports_color(Stdout, |t| t.green())
-                    );
+                    _ => {
+                        panic!("Unhandled ResolveError {e:?} (should not happen");
+                    }
                 }
             }
-        } else {
-            // Now that we know there's a missing PTR we do want to see the names that point here.
-            if !args.verbose {
-                list_names(addr, names);
-            }
-            println!(
-                "    {} for {}",
-                "Missing PTR".if_supports_color(Stdout, |t| t.bright_red()),
-                addr.if_supports_color(Stdout, |t| t.cyan())
-            );
-
-            failcount += 1;
         }
     }
 
@@ -259,9 +287,10 @@ fn list_names(addr: &IpAddr, names: &[String]) {
     println!("    {}", names.join(", "));
 }
 
-// Return an optional Vec of strings for the found PTR names. Usually there will be just one. If there's none,
-// this will return None, not an empty Vec.
-fn get_ptrs(addr: &IpAddr) -> Option<Vec<String>> {
+// Return a Vec of strings for the found PTR names. Usually there will be just one, but it's
+// possible for there to be multiple. If there's none this will return an empty Vec. On any kind
+// of non-fatal resolver error (e.g. timeout) this will return a ResolveError.
+fn get_ptrs(addr: &IpAddr) -> Result<Vec<String>, ResolveError> {
     // Construct a new Resolver using system's resolv.conf.
     let resolver = Resolver::from_system_conf().unwrap();
 
@@ -277,18 +306,16 @@ fn get_ptrs(addr: &IpAddr) -> Option<Vec<String>> {
             ResolveErrorKind::NoRecordsFound { .. } => {
                 // Empty answer, do nothing.
             }
+            ResolveErrorKind::Timeout => {
+                return Err(e);
+            }
             _ => {
-                println!("    Unhandled resolver error: {e:?}");
+                println!("Unhandled resolver error checking reverse for {addr}: {e:?}");
             }
         },
     }
 
-    if ptrs.is_empty() {
-        // Don't return an emoty vec, return None.
-        return None;
-    }
-
-    Some(ptrs)
+    Ok(ptrs)
 }
 
 fn do_axfr(

@@ -327,28 +327,26 @@ fn do_axfr(
             }
         };
 
-        if !response.contains_answer() {
-            match response.response_code() {
-                // NoError is okay. Some responses can be empty.
-                ResponseCode::NoError => {
-                    continue;
-                }
-                // Refused AXFR is the most common reason for getting no answers.
-                ResponseCode::Refused => {
-                    eprintln!("DNS server at {} refused our AXFR", address);
-                    std::process::exit(2);
-                }
-                // NotAuth also rather likely.
-                ResponseCode::NotAuth => {
-                    eprintln!(
-                        "DNS server at {} is not authoritative for zone {}",
-                        address, zone
-                    );
-                    std::process::exit(2);
-                }
-                _ => {
-                    return Err(eyre!("AXFR returned no answers: {response:?}"));
-                }
+        match response.response_code() {
+            // NoError is okay. Some responses can be empty.
+            ResponseCode::NoError => {
+                // Carry on.
+            }
+            // Refused AXFR is the most common reason for getting no answers.
+            ResponseCode::Refused => {
+                eprintln!("DNS server at {} refused our AXFR", address);
+                std::process::exit(2);
+            }
+            // NotAuth also rather likely.
+            ResponseCode::NotAuth => {
+                eprintln!(
+                    "DNS server at {} is not authoritative for zone {}",
+                    address, zone
+                );
+                std::process::exit(2);
+            }
+            _ => {
+                return Err(eyre!("AXFR returned no answers: {response:?}"));
             }
         }
 

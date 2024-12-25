@@ -139,9 +139,6 @@ fn main() -> Result<()> {
                     );
 
                     failcount += 1;
-
-                    // Leave match {} early.
-                    break;
                 }
                 for ptr in ptrnames {
                     // If a badre was supplied then need to check PTR against that. We compiled it
